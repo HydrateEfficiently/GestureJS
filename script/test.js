@@ -42,7 +42,7 @@ function main() {
 
 	function onMouseOut(e) {
 		isMouseDown = false;
-		clearAllPoints();
+		// clearAllPoints();
 	}
 
 	function clearAllPoints() {
@@ -74,6 +74,7 @@ function main() {
 				timeToDeath = Math.max(0, currentPoint.time - currentTime + MAX_GESTURE_TIME);
 				canvasContext.setStrokeColor(STROKE_COLOR_R, STROKE_COLOR_G, STROKE_COLOR_B, STROKE_OPACITY * timeToDeath / MAX_GESTURE_TIME);
 				canvasContext.lineTo(currentPoint.x, currentPoint.y);
+				canvasContext.lineWidth = 5;
 				canvasContext.stroke();
 			}
 		}
@@ -99,7 +100,8 @@ function main() {
 	}, 50);
 
 	testCanvas.addEventListener("mousemove", onMouseMove);
-	testCanvas.addEventListener("mouseout", onMouseOut);
+	testCanvas.addEventListener("mouseout", onMouseMove);
+	testCanvas.addEventListener("mouseover", onMouseOver);
 	testCanvas.addEventListener("mousedown", onMouseDown);
 	testCanvas.addEventListener("mouseup", onMouseUp);
 	window.onresize = setSize;
