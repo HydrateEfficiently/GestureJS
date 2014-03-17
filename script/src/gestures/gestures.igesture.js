@@ -18,11 +18,11 @@
 		gestures = {};
 
 	function IGesture(options) {
-		this.geometryGroup = options.geometryGroup;
 		this._name = options.name;
-		this._time = isNaN(options.time) ? 500 : options._time;
+		this._time = isNaN(options.time) ? 500 : options.time;
 		this._elements = [];
 		CustomDomEvents.registerEventType(this._name);
+
 	}
 
 	IGesture.prototype.getTime = function () {
@@ -33,13 +33,12 @@
 		if (!gesturesByElement[element]) {
 			gesturesByElement[element] = [];
 			PointTracker.trackPointsOnElement(element);
+			PointTracker.trackGesture(this);
 		}
-		gesturesByElement.push(this);
 		this._elements.push(element);
 	};
 
-	IGesture.prototype._checkMatched = function () {
-		var points = PointTracker.getPointsSince(this._time);
+	IGesture.prototype._checkMatch = function (points) {
 		if (this.isMatch(points)) {
 			this._fireEvent();
 		}

@@ -1,36 +1,6 @@
 /*jslint browser:true*/
-/*global Test, GestureJS, CustomDomEvents*/
-function main() {
-	"use strict";
-
-	var Gestures = GestureJS.Gestures,
-		IGesture = Gestures.IGesture;
-
-	if (typeof (Object.create) !== 'function') {
-		Object.create = function (o) {
-			function F() {}
-			F.prototype = o;
-			return new F();
-		};
-	}
-
-	var testCanvas = document.getElementById("test-canvas");
-	
-	var testGesture = Object.create(new IGesture({
-		name: "test",
-		time: 1000
-	}));
-
-	testGesture.isMatch = function () {
-		return false;
-	};
-
-	testGesture.register(testCanvas);
-
-	initView(testCanvas);
-}
-
-function initView(canvasElement) {
+/*global Test, GestureJS */
+(function () {
 	"use strict";
 
 	var STROKE_COLOR_R = 255,
@@ -40,14 +10,18 @@ function initView(canvasElement) {
 
 	var PointTracker = GestureJS.PointTracker;
 
-	var canvasContext,
+	var canvasElement,
+		canvasContext,
 		width,
 		height;
 
-	canvasContext = canvasElement.getContext("2d");
-	window.onresize = setSize;
-	canvasElement.addEventListener("mousemove", onMouseMove);
-	setSize();
+	function init(canvasElem) {
+		canvasElement = canvasElem;
+		canvasContext = canvasElement.getContext("2d");
+		window.onresize = setSize;
+		canvasElement.addEventListener("mousemove", onMouseMove);
+		setSize();
+	}
 
 	function setSize() {
 		var width = canvasElement.clientWidth;
@@ -79,4 +53,9 @@ function initView(canvasElement) {
 			}
 		}
 	}
-}
+
+	Test.TestView = {
+		init: init
+	};
+
+} ());

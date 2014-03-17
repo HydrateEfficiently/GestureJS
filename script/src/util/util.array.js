@@ -6,7 +6,7 @@
 	}
 
 	function findAllUntil(array, predicate) {
-		var untilIndex = _.indexOf(points, predicate);
+		var untilIndex = _.indexOf(array, predicate);
 		if (untilIndex === -1) {
 			return array.slice(); // All items match
 		} else if (untilIndex === 0) {

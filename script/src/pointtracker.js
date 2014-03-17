@@ -17,9 +17,14 @@
 		trackedElements = {};
 
 	function addPoint(ev) {
+		// TODO: find vectors from last two points to create nice curve to link. 
 		var point = new Point(ev);
 		pointsEventsMap.add(point, ev);
 		ArrayUtil.insert(points, point);
+	}
+
+	function getPointLifetime() {
+		return pointLifetime;
 	}
 
 	function getPoints() {
@@ -75,7 +80,8 @@
 	}, GESTURE_CHECK_INTERVAL);
 
 	GestureJS.PointTracker = {
-		addPoint: addPoint,
+		getPointLifetime: getPointLifetime,
+		getPoints: getPoints,
 		getPointsSince: getPointsSince,
 		trackPointsOnElement: trackPointsOnElement,
 		trackGesture: trackGesture
