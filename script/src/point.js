@@ -8,6 +8,7 @@
 		this._x = ev.x;
 		this._y = ev.y;
 		this._time = new Date().getTime();
+		this._elements = [];
 	}
 
 	Point.prototype.getX = function () {
@@ -24,6 +25,10 @@
 
 	Point.prototype.getTime = function () {
 		return this._time;
+	};
+
+	Point.prototype.addElement = function (element) {
+		this._elements.push(element);
 	};
 
 } ());

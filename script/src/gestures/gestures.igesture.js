@@ -22,7 +22,6 @@
 		this._name = options.name;
 		this._time = isNaN(options.time) ? 500 : options._time;
 		this._elements = [];
-		PointTracker.setPointLifetime(Math.max(this.getTime(), PointTracker.getPointLifetime()));
 		CustomDomEvents.registerEventType(this._name);
 	}
 
@@ -33,7 +32,7 @@
 	IGesture.prototype.register = function (element) {
 		if (!gesturesByElement[element]) {
 			gesturesByElement[element] = [];
-			listenOnElement(element);
+			PointTracker.trackPointsOnElement(element);
 		}
 		gesturesByElement.push(this);
 		this._elements.push(element);
@@ -52,9 +51,4 @@
 			element[eventName]();
 		});
 	};
-
-	function listenOnElement(element) {
-
-	}
-
 } ());

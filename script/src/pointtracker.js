@@ -1,26 +1,29 @@
-/*global _, GestureJS */
+/*global _, GestureJS, setInterval */
 (function () {
 	"use strict";
 
 	// Imports
-	var ArrayUtil = GestureJS.Util.Array;
+	var Point = GestureJS.Point,
+		TwoWayMap = GestureJS.TwoWayMap,
+		ArrayUtil = GestureJS.Util.Array;
 
 	// Constants
-	var DEFAULT_POINT_LIFETIME_MS = 1000;
+	var	GESTURE_CHECK_INTERVAL = 50;
 
 	var points = [],
-		pointLifetime = DEFAULT_POINT_LIFETIME_MS;
+		pointsEventsMap = new TwoWayMap(),
+		pointLifetime = 0,
+		trackedGestures = {},
+		trackedElements = {};
 
-	function getPointLifetime() {
-		return pointLifetime;
-	}
-
-	function setPointLifetime(timeMs) {
-		pointLifetime = timeMs;
-	}
-
-	function addPoint(point) {
+	function addPoint(ev) {
+		var point = new Point(ev);
+		pointsEventsMap.add(point, ev);
 		ArrayUtil.insert(points, point);
+	}
+
+	function getPoints() {
+		return points.slice();
 	}
 
 	function getPointsSince(timestamp) {
@@ -29,11 +32,53 @@
 		});
 	}
 
+	function trackPointsOnElement(element) {
+		if (!trackedElements[element]) {
+			trackedElements[element] = element;
+			listenOnElement(element);
+		}
+	}
+
+	function trackGesture(gesture) {
+		if (!trackedGestures[gesture]) {
+			trackedGestures[gesture] = gesture;
+			pointLifetime = Math.max(pointLifetime, gesture.getTime());
+		}
+	}
+
+	function listenOnElement(element) {
+		element.addEventListener("mouseover", function (ev) {
+			var trackedPoint = pointsEventsMap.get(ev);
+			if (!trackedPoint) {
+				addPoint(ev);
+				trackedPoint = pointsEventsMap.get(ev);
+			}
+			trackedPoint.addElement(element);
+		});
+	}
+
+	function removeOldPoints() {
+		var currentTime = new Date().getTime(),
+			removedPoints = _.reject(points, function (point) {
+				return currentTime > point.time + pointLifetime;
+			});
+		_.each(removedPoints, function (point) {
+			pointsEventsMap.remove(point);
+		});
+	}
+
+	setInterval(function () {
+		removeOldPoints();
+		_.each(trackedGestures, function (gesture) {
+			gesture._checkMatch(getPointsSince(gesture.getTime()));
+		});
+	}, GESTURE_CHECK_INTERVAL);
+
 	GestureJS.PointTracker = {
-		getPointLifetime: getPointLifetime,
-		setPointLifetime: setPointLifetime,
 		addPoint: addPoint,
-		getPointsSince: getPointsSince
+		getPointsSince: getPointsSince,
+		trackPointsOnElement: trackPointsOnElement,
+		trackGesture: trackGesture
 	};
 	
 } ());
