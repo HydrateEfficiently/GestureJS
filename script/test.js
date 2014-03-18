@@ -3,29 +3,15 @@
 function main() {
 	"use strict";
 
-	var Gestures = GestureJS.Gestures,
-		IGesture = Gestures.IGesture;
-
-	if (typeof (Object.create) !== 'function') {
-		Object.create = function (o) {
-			function F() {}
-			F.prototype = o;
-			return new F();
-		};
-	}
-
-	var testCanvas = document.getElementById("test-canvas");
-	
-	var testGesture = Object.create(new IGesture({
-		name: "test",
-		time: 1000
-	}));
-
-	testGesture.isMatch = function () {
-		return false;
-	};
-
-	testGesture.register(testCanvas);
+	var testCanvas = document.getElementById("test-canvas"),
+		testGesture = GestureJS.define({
+			name: "test",
+			time: 1000,
+			element: testCanvas,
+			isMatch: function (points) {
+				return false;
+			}
+		});
 
 	initView(testCanvas);
 }
@@ -36,7 +22,7 @@ function initView(canvasElement) {
 	var STROKE_COLOR_R = 255,
 		STROKE_COLOR_G = 215,
 		STROKE_COLOR_B = 0,
-		STROKE_OPACITY = 1;
+		BASE_STROKE_OPACITY = 1;
 
 	var PointTracker = GestureJS.PointTracker;
 
@@ -63,7 +49,8 @@ function initView(canvasElement) {
 			currentTime = new Date().getTime(),
 			pointLifetime = PointTracker.getPointLifetime(),
 			timeToDeath,
-			currentPoint;
+			currentPoint,
+			opacity;
 
 		if (firstPoint) {
 			canvasContext.beginPath();
@@ -71,8 +58,9 @@ function initView(canvasElement) {
 
 			for (var i = numberOfPoints - 1; i >= 0; i--) {
 				currentPoint = points[i];
-				timeToDeath = Math.max(0, currentPoint.time - currentTime + pointLifetime);
-				canvasContext.setStrokeColor(STROKE_COLOR_R, STROKE_COLOR_G, STROKE_COLOR_B, STROKE_OPACITY * timeToDeath / pointLifetime);
+				timeToDeath = Math.max(0, currentPoint.getTime() - currentTime + pointLifetime);
+				opacity = BASE_STROKE_OPACITY * timeToDeath / pointLifetime;
+				canvasContext.setStrokeColor(STROKE_COLOR_R, STROKE_COLOR_G, STROKE_COLOR_B, opacity);
 				canvasContext.lineTo(currentPoint.x, currentPoint.y);
 				canvasContext.lineWidth = 5;
 				canvasContext.stroke();

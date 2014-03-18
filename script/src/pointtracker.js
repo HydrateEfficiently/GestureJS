@@ -8,20 +8,14 @@
 		ArrayUtil = GestureJS.Util.Array;
 
 	// Constants
-	var	GESTURE_CHECK_INTERVAL = 50;
+	var	GESTURE_CHECK_INTERVAL = 500,
+		EVENT_TRACKING_KEY = "__gesturejs_tracked";
 
 	var points = [],
-		pointsEventsMap = new TwoWayMap(),
+		pointsByTime = {},
 		pointLifetime = 0,
 		trackedGestures = {},
 		trackedElements = {};
-
-	function addPoint(ev) {
-		// TODO: find vectors from last two points to create nice curve to link. 
-		var point = new Point(ev);
-		pointsEventsMap.add(point, ev);
-		ArrayUtil.insert(points, point);
-	}
 
 	function getPointLifetime() {
 		return pointLifetime;
@@ -52,24 +46,40 @@
 	}
 
 	function listenOnElement(element) {
-		element.addEventListener("mouseover", function (ev) {
-			var trackedPoint = pointsEventsMap.get(ev);
-			if (!trackedPoint) {
-				addPoint(ev);
-				trackedPoint = pointsEventsMap.get(ev);
+		element.addEventListener("mousemove", function (ev) {
+			var point = getPoint(ev);
+			if (!point) {
+				point = new Point(ev);
+				ArrayUtil.insert(points, point);
+				ev.EVENT_TRACKING_KEY = point.getTime();
+				pointsByTime[point.getTime()] = point;
 			}
-			trackedPoint.addElement(element);
+			point.addElement(element);
 		});
 	}
 
+	function getPoint(ev) {
+		var time = ev[EVENT_TRACKING_KEY];
+		if (!isNaN(time)) {
+			return pointsByTime[time];
+		}
+	}
+
 	function removeOldPoints() {
+		console.log("start removeOldPoints: " + points.length);
 		var currentTime = new Date().getTime(),
+			numberOfPoints = points.length,
 			removedPoints = _.reject(points, function (point) {
 				return currentTime > point.time + pointLifetime;
-			});
+			}),
+			pointsToRemove = removedPoints.length,
+			startIndex = numberOfPoints - pointsToRemove;
+
+		points.splice(startIndex, pointsToRemove);
 		_.each(removedPoints, function (point) {
-			pointsEventsMap.remove(point);
+			delete pointsByTime[point.getTime()];
 		});
+		console.log("end removeOldPoints: " + points.length);
 	}
 
 	setInterval(function () {

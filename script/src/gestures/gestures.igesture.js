@@ -8,21 +8,55 @@
 		PointTracker = GestureJS.PointTracker;
 
 	// Export
-	GestureJS.Gestures.IGesture = IGesture;
+	GestureJS.define = function (config) {
+		return new IGesture(config);
+	};
 
 	// Constants
 	var GESTURE_EVENT_SUFFIX = "gesture";
 
 	// Statics
 	var gesturesByElement = {},
-		gestures = {};
+		gestures = {},
+		names = {};
 
 	function IGesture(options) {
-		this._name = options.name;
-		this._time = isNaN(options.time) ? 500 : options.time;
-		this._elements = [];
-		CustomDomEvents.registerEventType(this._name);
+		if (typeof (options) !== "object") {
+			throw "An gesture must be defined with an options object.";
+		}
 
+		if (typeof (options.isMatch) === "function") {
+			this._isMatch = options.isMatch;
+		} else {
+			throw "Must define isMatch function.";
+		}
+
+		var name = options.name;
+		if (!name) {
+			throw "Must define a name for gesture.";
+		} else if (names[name]) {
+			throw "Gesture with name " + name + " has already been defined.";
+		}
+
+		if (options.element) {
+			this._elements = [];
+			this._elements.push(options.element);
+		} else if (options.elements) {
+			if (Array.isArray(options.elements)) {
+				this._elements = options.elements.slice();
+			} else {
+				throw "elements option must be an array";
+			}
+		} else {
+			this._elements = [];
+		}
+
+		this._time = isNaN(options.time) ? 500 : options.time;
+		if (this._elements[0]) {
+			this.register(this._elements[0]);
+		}
+		CustomDomEvents.registerEventType(name);
+		this._name = name;
 	}
 
 	IGesture.prototype.getTime = function () {
@@ -39,7 +73,7 @@
 	};
 
 	IGesture.prototype._checkMatch = function (points) {
-		if (this.isMatch(points)) {
+		if (this._isMatch(points)) {
 			this._fireEvent();
 		}
 	};
@@ -50,4 +84,5 @@
 			element[eventName]();
 		});
 	};
+
 } ());
