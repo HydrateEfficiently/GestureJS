@@ -6,7 +6,7 @@ function main() {
 	var testCanvas = document.getElementById("test-canvas"),
 		testGesture = GestureJS.define({
 			name: "test",
-			time: 1000,
+			time: 500,
 			element: testCanvas,
 			isMatch: function (points) {
 				return false;
@@ -32,7 +32,8 @@ function initView(canvasElement) {
 
 	canvasContext = canvasElement.getContext("2d");
 	window.onresize = setSize;
-	canvasElement.addEventListener("mousemove", onMouseMove);
+	canvasElement.addEventListener("mousemove", updateCanvas);
+	setInterval(updateCanvas, 50);
 	setSize();
 
 	function setSize() {
@@ -42,15 +43,17 @@ function initView(canvasElement) {
 		canvasElement.setAttribute("height", height);
 	}
 
-	function onMouseMove() {
+	function updateCanvas() {
 		var points = PointTracker.getPoints(),
 			numberOfPoints = points.length,
-			firstPoint = points[0],
+			firstPoint = points[numberOfPoints - 1],
 			currentTime = new Date().getTime(),
 			pointLifetime = PointTracker.getPointLifetime(),
 			timeToDeath,
 			currentPoint,
 			opacity;
+
+		canvasElement.width = canvasElement.width; // Clear old path.
 
 		if (firstPoint) {
 			canvasContext.beginPath();
@@ -61,7 +64,7 @@ function initView(canvasElement) {
 				timeToDeath = Math.max(0, currentPoint.getTime() - currentTime + pointLifetime);
 				opacity = BASE_STROKE_OPACITY * timeToDeath / pointLifetime;
 				canvasContext.setStrokeColor(STROKE_COLOR_R, STROKE_COLOR_G, STROKE_COLOR_B, opacity);
-				canvasContext.lineTo(currentPoint.x, currentPoint.y);
+				canvasContext.lineTo(currentPoint.getX(), currentPoint.getY());
 				canvasContext.lineWidth = 5;
 				canvasContext.stroke();
 			}

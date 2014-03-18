@@ -8,7 +8,7 @@
 		ArrayUtil = GestureJS.Util.Array;
 
 	// Constants
-	var	GESTURE_CHECK_INTERVAL = 500,
+	var	GESTURE_CHECK_INTERVAL = 100,
 		EVENT_TRACKING_KEY = "__gesturejs_tracked";
 
 	var points = [],
@@ -66,20 +66,17 @@
 	}
 
 	function removeOldPoints() {
-		console.log("start removeOldPoints: " + points.length);
-		var currentTime = new Date().getTime(),
-			numberOfPoints = points.length,
-			removedPoints = _.reject(points, function (point) {
-				return currentTime > point.time + pointLifetime;
+		var currentTime = new Date().getTime();
+		var numberOfPoints = points.length,
+			pointsToRemove = _.filter(points, function (point) {
+				return currentTime > point.getTime() + pointLifetime;
 			}),
-			pointsToRemove = removedPoints.length,
-			startIndex = numberOfPoints - pointsToRemove;
+			startIndex = numberOfPoints - pointsToRemove.length;
 
-		points.splice(startIndex, pointsToRemove);
-		_.each(removedPoints, function (point) {
+		points.splice(startIndex, pointsToRemove.length);
+		_.each(pointsToRemove, function (point) {
 			delete pointsByTime[point.getTime()];
 		});
-		console.log("end removeOldPoints: " + points.length);
 	}
 
 	setInterval(function () {
