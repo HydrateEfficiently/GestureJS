@@ -60,9 +60,9 @@
 	function addInterpolatedPoints() {
 		var numberOfPoints = recordedPoints.length;
 		if (numberOfPoints >= MIN_NUMBER_POINTS_FOR_INTERPOLATION) {
-			var startPoint = recordedPoints[2],
+			var startPoint = recordedPoints[0],
 				endPoint = recordedPoints[1],
-				currentPoint = recordedPoints[0],
+				currentPoint = recordedPoints[2],
 				startTime = startPoint.getTime(),
 				endTime = endPoint.getTime(),
 				deltaTime = endTime - startTime,
