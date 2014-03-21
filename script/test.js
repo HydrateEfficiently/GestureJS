@@ -7,6 +7,7 @@ function main() {
 		testGesture = GestureJS.define({
 			name: "test",
 			time: 500,
+			minPoints: 10,
 			element: testCanvas,
 			isMatch: function (points) {
 				return false;

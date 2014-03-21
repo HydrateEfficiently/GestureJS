@@ -13,7 +13,9 @@
 	};
 
 	// Constants
-	var GESTURE_EVENT_SUFFIX = "gesture";
+	var GESTURE_EVENT_SUFFIX = "gesture",
+		DEFAULT_MIN_POINTS = 1,
+		DEFAULT_MAX_TIME = 500;
 
 	// Statics
 	var gesturesByElement = {},
@@ -51,7 +53,8 @@
 			this._elements = [];
 		}
 
-		this._time = isNaN(options.time) ? 500 : options.time;
+		this._minPoints = isNaN(options.minPoints) ? DEFAULT_MIN_POINTS : options.minPoints;
+		this._time = isNaN(options.time) ? DEFAULT_MAX_TIME : options.time;
 		if (this._elements[0]) {
 			this.register(this._elements[0]);
 		}
@@ -59,8 +62,12 @@
 		this._name = name;
 	}
 
-	IGesture.prototype.getTime = function () {
+	IGesture.prototype.getMaxTime = function () {
 		return this._time;
+	};
+
+	IGesture.prototype.getMinPoints = function () {
+		return this._minPoints;
 	};
 
 	IGesture.prototype.register = function (element) {

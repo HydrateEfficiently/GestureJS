@@ -2,13 +2,6 @@
 (function () {
 	"use strict";
 
-	function getCurvePoints(lastPoint, currentPoint, nextPoint, resolution, tension) {
-		var points = [],
-			currentTime = currentPoint.getTime(),
-			lastTime = currentPoint.getTime(),
-			deltaTime = lastTime - currentTime;
-	}
-
 	function interpolateForSpline(startPoint, endPoint, currentPoint, resolution, tension, func_x_y_t) {
 			// Tension vectors
 		var t1x = (startPoint.x - endPoint.x) * tension,
@@ -34,8 +27,15 @@
 		}
 	}
 
+	function getDistanceBetweenPoints(a, b) {
+		var deltaX = b.x - a.x,
+			deltaY = b.y - a.y;
+		return Math.sqrt(Math.pow(deltaX, 2), Math.pow(deltaY, 2));
+	}
+
 	GestureJS.Util.Geometry = {
-		interpolateForSpline: interpolateForSpline
+		interpolateForSpline: interpolateForSpline,
+		getDistanceBetweenPoints: getDistanceBetweenPoints
 	};
 	
 } ());

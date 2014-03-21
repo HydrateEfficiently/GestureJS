@@ -11,7 +11,7 @@
 	// Constants
 	var	GESTURE_CHECK_INTERVAL = 100,
 		MIN_NUMBER_POINTS_FOR_INTERPOLATION = 3,
-		INTERPOLATION_FACTOR = 5,
+		INTERPOLATION_PIXEL_DIST = 5,
 		SPLINE_TENSION = 0.5,
 		EVENT_TRACKING_KEY = "__gesturejs_tracked";
 
@@ -46,7 +46,7 @@
 	function trackGesture(gesture) {
 		if (!trackedGestures[gesture]) {
 			trackedGestures[gesture] = gesture;
-			pointLifetime = Math.max(pointLifetime, gesture.getTime());
+			pointLifetime = Math.max(pointLifetime, gesture.getMaxTime());
 		}
 	}
 
@@ -66,14 +66,20 @@
 				startTime = startPoint.getTime(),
 				endTime = endPoint.getTime(),
 				deltaTime = endTime - startTime,
+				interpolationFactor = getInterpolationFactor(startPoint, endPoint),
 				points = [];
 
-			GeometryUtil.interpolateForSpline(startPoint, endPoint, currentPoint, INTERPOLATION_FACTOR, SPLINE_TENSION, function (x, y, t) {
+			GeometryUtil.interpolateForSpline(startPoint, endPoint, currentPoint, interpolationFactor, SPLINE_TENSION, function (x, y, t) {
 				points.push(new Point(Math.round(x), Math.round(y), Math.round(startTime + deltaTime * t)));
 			});
 
 			ArrayUtil.unshiftRange(interpolatedPoints, points);
 		}
+	}
+
+	function getInterpolationFactor(startPoint, endPoint) {
+		var dist = GeometryUtil.getDistanceBetweenPoints(startPoint, endPoint);
+		return Math.ceil(dist / INTERPOLATION_PIXEL_DIST);
 	}
 
 	function removeOldPoints() {
@@ -95,7 +101,10 @@
 	setInterval(function () {
 		removeOldPoints();
 		_.each(trackedGestures, function (gesture) {
-			gesture._checkMatch(getPointsSince(gesture.getTime()));
+			var points = getPointsSince(gesture.getMaxTime());
+			if (points.length > gesture.getMinPoints()) {
+				gesture._checkMatch(points);
+			}
 		});
 	}, GESTURE_CHECK_INTERVAL);
 
