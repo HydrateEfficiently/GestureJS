@@ -26,11 +26,11 @@ function initView(canvasElement) {
 
 	var PointTracker = GestureJS.PointTracker;
 
-	var canvasContext,
+	var ctx,
 		width,
 		height;
 
-	canvasContext = canvasElement.getContext("2d");
+	ctx = canvasElement.getContext("2d");
 	window.onresize = setSize;
 	canvasElement.addEventListener("mousemove", updateCanvas);
 	setInterval(updateCanvas, 50);
@@ -46,28 +46,30 @@ function initView(canvasElement) {
 	function updateCanvas() {
 		var points = PointTracker.getPoints(),
 			numberOfPoints = points.length,
-			firstPoint = points[numberOfPoints - 1],
+			firstPoint = points[0],
 			currentTime = new Date().getTime(),
-			pointLifetime = PointTracker.getPointLifetime(),
-			timeToDeath,
-			currentPoint,
-			opacity;
+			currentPoint;
 
 		canvasElement.width = canvasElement.width; // Clear old path.
+		ctx.lineWidth = 2;
 
 		if (firstPoint) {
-			canvasContext.beginPath();
-			canvasContext.moveTo(firstPoint.x, firstPoint.y);
+			ctx.beginPath();
+			ctx.moveTo(firstPoint.x, firstPoint.y);
 
-			for (var i = numberOfPoints - 1; i >= 0; i--) {
+			for (var i = 1; i < numberOfPoints - 1; i++) {
 				currentPoint = points[i];
-				timeToDeath = Math.max(0, currentPoint.getTime() - currentTime + pointLifetime);
-				opacity = 1; //BASE_STROKE_OPACITY * timeToDeath / pointLifetime;
-				canvasContext.setStrokeColor(STROKE_COLOR_R, STROKE_COLOR_G, STROKE_COLOR_B, opacity);
-				canvasContext.lineTo(currentPoint.x, currentPoint.y);
-				canvasContext.lineWidth = 1;
-				canvasContext.stroke();
+				setStrokeColor(ctx, currentPoint, currentTime);
+				ctx.lineTo(currentPoint.x, currentPoint.y);
+				ctx.stroke();
 			}
 		}
+	}
+
+	function setStrokeColor(ctx, point, time) {
+		var pointLifetime = PointTracker.getPointLifetime(),
+			timeToDeath = Math.max(0, point.getTime() - time + pointLifetime),
+			opacity = BASE_STROKE_OPACITY * timeToDeath / pointLifetime;
+		ctx.setStrokeColor(STROKE_COLOR_R, STROKE_COLOR_G, STROKE_COLOR_B, opacity);
 	}
 }
