@@ -62,9 +62,9 @@ function initView(canvasElement) {
 			for (var i = numberOfPoints - 1; i >= 0; i--) {
 				currentPoint = points[i];
 				timeToDeath = Math.max(0, currentPoint.getTime() - currentTime + pointLifetime);
-				opacity = BASE_STROKE_OPACITY * timeToDeath / pointLifetime;
+				opacity = 1; //BASE_STROKE_OPACITY * timeToDeath / pointLifetime;
 				canvasContext.setStrokeColor(STROKE_COLOR_R, STROKE_COLOR_G, STROKE_COLOR_B, opacity);
-				canvasContext.lineTo(currentPoint.getX(), currentPoint.getY());
+				canvasContext.lineTo(currentPoint.x, currentPoint.y);
 				canvasContext.lineWidth = 5;
 				canvasContext.stroke();
 			}

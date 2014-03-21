@@ -4,14 +4,19 @@
 
 	// Imports
 	var Point = GestureJS.Point,
-		TwoWayMap = GestureJS.TwoWayMap,
-		ArrayUtil = GestureJS.Util.Array;
+		Util = GestureJS.Util,
+		ArrayUtil = Util.Array,
+		GeometryUtil = Util.Geometry;
 
 	// Constants
 	var	GESTURE_CHECK_INTERVAL = 100,
+		MIN_NUMBER_POINTS_FOR_INTERPOLATION = 3,
+		INTERPOLATION_FACTOR = 5,
+		SPLINE_TENSION = 0.5,
 		EVENT_TRACKING_KEY = "__gesturejs_tracked";
 
-	var points = [],
+	var recordedPoints = [],
+		interpolatedPoints = [],
 		pointsByTime = {},
 		pointLifetime = 0,
 		trackedGestures = {},
@@ -22,11 +27,11 @@
 	}
 
 	function getPoints() {
-		return points.slice();
+		return interpolatedPoints.slice();
 	}
 
 	function getPointsSince(timestamp) {
-		return ArrayUtil.findAllUntil(points, function (point) {
+		return ArrayUtil.findAllUntil(interpolatedPoints, function (point) {
 			return point.getTime() < timestamp;
 		});
 	}
@@ -47,35 +52,43 @@
 
 	function listenOnElement(element) {
 		element.addEventListener("mousemove", function (ev) {
-			var point = getPoint(ev);
-			if (!point) {
-				point = new Point(ev);
-				ArrayUtil.insert(points, point);
-				ev.EVENT_TRACKING_KEY = point.getTime();
-				pointsByTime[point.getTime()] = point;
-			}
-			point.addElement(element);
+			recordedPoints.unshift(new Point(ev.x, ev.y, new Date().getTime()));
+			addInterpolatedPoints();
 		});
 	}
 
-	function getPoint(ev) {
-		var time = ev[EVENT_TRACKING_KEY];
-		if (!isNaN(time)) {
-			return pointsByTime[time];
+	function addInterpolatedPoints() {
+		var numberOfPoints = recordedPoints.length;
+		if (numberOfPoints >= MIN_NUMBER_POINTS_FOR_INTERPOLATION) {
+			var startPoint = recordedPoints[numberOfPoints - 3],
+				endPoint = recordedPoints[numberOfPoints - 2],
+				currentPoint = recordedPoints[numberOfPoints - 1],
+				startTime = startPoint.getTime(),
+				endTime = endPoint.getTime(),
+				deltaTime = endTime - startTime,
+				points = [];
+
+			GeometryUtil.interpolateForSpline(startPoint, endPoint, currentPoint, INTERPOLATION_FACTOR, SPLINE_TENSION, function (x, y, t) {
+				points.push(new Point(Math.round(x), Math.round(y), startTime + deltaTime * t));
+			});
+
+			ArrayUtil.unshiftRange(interpolatedPoints, points);
 		}
 	}
 
 	function removeOldPoints() {
-		var currentTime = new Date().getTime();
-		var numberOfPoints = points.length,
-			pointsToRemove = _.filter(points, function (point) {
-				return currentTime > point.getTime() + pointLifetime;
-			}),
-			startIndex = numberOfPoints - pointsToRemove.length;
+		var minTime = new Date().getTime() - pointLifetime,
+			ixFirstExpiredRecordedPoint = indexOfFirstExpiredPoint(recordedPoints, minTime),
+			ixFirstExpiredInterpolatedPoint = indexOfFirstExpiredPoint(interpolatedPoints, minTime);
 
-		points.splice(startIndex, pointsToRemove.length);
-		_.each(pointsToRemove, function (point) {
-			delete pointsByTime[point.getTime()];
+		recordedPoints.splice(ixFirstExpiredRecordedPoint, recordedPoints.length - ixFirstExpiredRecordedPoint);
+		interpolatedPoints.splice(ixFirstExpiredInterpolatedPoint, interpolatedPoints.length - ixFirstExpiredInterpolatedPoint);
+	}
+
+	function indexOfFirstExpiredPoint(points, minTime) {
+		var dummyPoint = new Point(0, 0, minTime);
+		return _.sortedIndex(points, dummyPoint, function (point) {
+			return -point.getTime(); // Compare negative time to reverse index.
 		});
 	}
 
