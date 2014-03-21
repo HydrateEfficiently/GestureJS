@@ -65,7 +65,7 @@ function initView(canvasElement) {
 				opacity = 1; //BASE_STROKE_OPACITY * timeToDeath / pointLifetime;
 				canvasContext.setStrokeColor(STROKE_COLOR_R, STROKE_COLOR_G, STROKE_COLOR_B, opacity);
 				canvasContext.lineTo(currentPoint.x, currentPoint.y);
-				canvasContext.lineWidth = 5;
+				canvasContext.lineWidth = 1;
 				canvasContext.stroke();
 			}
 		}

@@ -60,16 +60,16 @@
 	function addInterpolatedPoints() {
 		var numberOfPoints = recordedPoints.length;
 		if (numberOfPoints >= MIN_NUMBER_POINTS_FOR_INTERPOLATION) {
-			var startPoint = recordedPoints[numberOfPoints - 3],
-				endPoint = recordedPoints[numberOfPoints - 2],
-				currentPoint = recordedPoints[numberOfPoints - 1],
+			var startPoint = recordedPoints[2],
+				endPoint = recordedPoints[1],
+				currentPoint = recordedPoints[0],
 				startTime = startPoint.getTime(),
 				endTime = endPoint.getTime(),
 				deltaTime = endTime - startTime,
 				points = [];
 
 			GeometryUtil.interpolateForSpline(startPoint, endPoint, currentPoint, INTERPOLATION_FACTOR, SPLINE_TENSION, function (x, y, t) {
-				points.push(new Point(Math.round(x), Math.round(y), startTime + deltaTime * t));
+				points.push(new Point(Math.round(x), Math.round(y), Math.round(startTime + deltaTime * t)));
 			});
 
 			ArrayUtil.unshiftRange(interpolatedPoints, points);
