@@ -1,5 +1,6 @@
 /*global _, GestureJS */
 (function () {
+	"use strict";
 
 	function insert(array, item, index) {
 		array.splice(index, 0, item);
@@ -24,10 +25,17 @@
 		}
 	}
 
+	function binarySearchByProperty(sortedArray, candidate, prop) {
+		return _.sortedIndex(sortedArray, candidate, function (item) {
+			return item[prop];
+		});
+	}
+
 	GestureJS.Util.Array = {
 		insert: insert,
 		findAllUntil: findAllUntil,
-		unshiftRange: unshiftRange
+		unshiftRange: unshiftRange,
+		binarySearchByProperty: binarySearchByProperty
 	};
 
 } ());

@@ -8,8 +8,9 @@
 		PointTracker = GestureJS.PointTracker;
 
 	// Export
-	GestureJS.define = function (config) {
-		return new IGesture(config);
+	GestureJS.Gesture = {
+		define: define,
+		_checkOptionsExists: checkOptionsExists
 	};
 
 	// Constants
@@ -23,9 +24,7 @@
 		names = {};
 
 	function IGesture(options) {
-		if (typeof (options) !== "object") {
-			throw "An gesture must be defined with an options object.";
-		}
+		checkOptionsExists(options);
 
 		if (typeof (options.isMatch) === "function") {
 			this._isMatch = options.isMatch;
@@ -60,10 +59,15 @@
 		}
 		CustomDomEvents.registerEventType(name);
 		this._name = name;
+		this._timeFired = 0;
 	}
 
-	IGesture.prototype.getMaxTime = function () {
+	IGesture.prototype.getTimeMilliseconds = function () {
 		return this._time;
+	};
+
+	IGesture.prototype.getEarliestValidTime = function (currentTime) {
+		return Math.max(this._timeFired, currentTime - this._time);
 	};
 
 	IGesture.prototype.getMinPoints = function () {
@@ -90,6 +94,21 @@
 		_.each(this._elements, function (element) {
 			element[eventName]();
 		});
+		this._timeFired = new Date().getTime();
 	};
+
+	IGesture.prototype._getLastTimeFired = function () {
+		return this._timeFired;
+	};
+
+	function define(options) {
+		return new IGesture(options);
+	}
+
+	function checkOptionsExists(options) {
+		if (typeof (options) !== "object") {
+			throw "An gesture must be defined with an options object.";
+		}
+	}
 
 } ());

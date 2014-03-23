@@ -46,7 +46,7 @@
 	function trackGesture(gesture) {
 		if (!trackedGestures[gesture]) {
 			trackedGestures[gesture] = gesture;
-			pointLifetime = Math.max(pointLifetime, gesture.getMaxTime());
+			pointLifetime = Math.max(pointLifetime, gesture.getTimeMilliseconds());
 		}
 	}
 
@@ -101,7 +101,7 @@
 	setInterval(function () {
 		removeOldPoints();
 		_.each(trackedGestures, function (gesture) {
-			var points = getPointsSince(gesture.getMaxTime());
+			var points = getPointsSince(gesture.getEarliestValidTime());
 			if (points.length > gesture.getMinPoints()) {
 				gesture._checkMatch(points);
 			}
