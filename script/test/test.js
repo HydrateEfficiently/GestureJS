@@ -77,5 +77,5 @@ define(function (require) {
 				ctx.setStrokeColor(STROKE_COLOR_R, STROKE_COLOR_G, STROKE_COLOR_B, opacity);
 			}
 		}
-	};		
+	};
 });

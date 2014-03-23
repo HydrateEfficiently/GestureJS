@@ -25,10 +25,42 @@ define(function () {
 		}
 	}
 
-	function binarySearchByProperty(sortedArray, candidate, prop) {
-		return _.sortedIndex(sortedArray, candidate, function (item) {
-			return item[prop];
-		});
+	function binarySearchByProperty(sortedArray, candidate, compare) {
+		return _.sortedIndex(sortedArray, candidate, getIteratorForSortedIndex(compare));
+	}
+
+	function binaryInsert(sortedArray, candidate, compare) {
+		var index = binarySearchByProperty(sortedArray, candidate, compare);
+		sortedArray.insert(sortedArray, 0, candidate);
+	}
+
+	function binaryRemove(sortedArray, candidate, compare) {
+		var index = binarySearchByProperty(sortedArray, candidate, compare),
+			item = sortedArray[index],
+			iteratorFunc = getIteratorForSortedIndex(compare),
+			wasRemoved = false;
+
+		if (iteratorFunc) { // Don't do default equality check.
+			if (iteratorFunc(item) === iteratorFunc(candidate)) {
+				sortedArray.splice(index, 1);
+				wasRemoved = true;
+			}
+		} else if (item === candidate) {
+			sortedArray.splice(index, 1);
+			wasRemoved = true;
+		}
+
+		return wasRemoved;
+	}
+
+	function getIteratorForSortedIndex(compare) {
+		if (typeof (compare) === "function") {
+			return compare;
+		} else if (typeof (compare) === "string") {
+			return function (item) {
+				return item[compare];
+			};
+		}
 	}
 
 	return {

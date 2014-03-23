@@ -19,27 +19,7 @@ define(function (require) {
 	};
 
 	SmoothGesture.prototype._createOrGetBox = function (points, width, height) {
-		var boxesByWidth = this._boxesByWidthByHeight[width];
-		if (!boxesByWidth) {
-			boxesByWidth = this._boxesByWidthByHeight[width] = [];
-		}
 
-		var widthByHeight = boxesByWidth[height];
-		if (!widthByHeight) {
-			widthByHeight = boxesByWidth[height] = new GestureBox(points);
-		}
-
-
-
-
-
-
-		if (!this._boxesByScale) {
-			this._boxesByScale = {};
-			this._boxesByWidthScaleByHeightScale["1,1"] = new GestureBox(points);
-		} else {
-
-		}
 	};
 
 
