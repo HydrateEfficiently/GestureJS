@@ -1,15 +1,9 @@
-/*jslint browser:true*/
-/*global _, GestureJS */
-(function () {
+define(function (require) {
 	"use strict";
 
-	// Imports
-	var GesturePoint = GestureJS.Point,
-		PointTracker = GestureJS.PointTracker,
-		GestureBox = GestureJS.GestureBox,
-		Gesture = GestureJS.Gesture;
+	var	Gesture = require("src/gestures/gestures.gesture"),
+		GestureBox = require("src/gesturebox");
 
-	// Export
 	Gesture.SmoothGesture = Gesture;
 
 	function SmoothGesture(options) {
@@ -48,8 +42,10 @@
 		}
 	};
 
+
 	function getBox(pattern) {
 		return new GestureBox(pattern);
 	}
-	
-} ());
+
+	return SmoothGesture;
+});

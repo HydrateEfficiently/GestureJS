@@ -1,12 +1,12 @@
 /*global _, GestureJS, setInterval */
-(function () {
+define(function (require) {
 	"use strict";
 
 	// Imports
-	var Point = GestureJS.Point,
-		Util = GestureJS.Util,
-		ArrayUtil = Util.Array,
-		GeometryUtil = Util.Geometry;
+	var Point = require("src/point"),
+		ArrayUtil = require("src/util/util.array"),
+		GeometryUtil = require("src/util/util.geometry"),
+		_ = require("third/lodash.min");
 
 	// Constants
 	var	GESTURE_CHECK_INTERVAL = 100,
@@ -108,7 +108,7 @@
 		});
 	}, GESTURE_CHECK_INTERVAL);
 
-	GestureJS.PointTracker = {
+	return {
 		getPointLifetime: getPointLifetime,
 		getPoints: getPoints,
 		getPointsSince: getPointsSince,
@@ -116,4 +116,4 @@
 		trackGesture: trackGesture
 	};
 	
-} ());
+});

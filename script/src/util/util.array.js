@@ -1,5 +1,5 @@
 /*global _, GestureJS */
-(function () {
+define(function () {
 	"use strict";
 
 	function insert(array, item, index) {
@@ -31,11 +31,11 @@
 		});
 	}
 
-	GestureJS.Util.Array = {
+	return {
 		insert: insert,
 		findAllUntil: findAllUntil,
 		unshiftRange: unshiftRange,
 		binarySearchByProperty: binarySearchByProperty
 	};
 
-} ());
+});

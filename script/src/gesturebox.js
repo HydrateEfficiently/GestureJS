@@ -1,12 +1,8 @@
-/*global GestureJS, _ */
-(function () {
+define(function (require) {
 	"use strict";
 
-	// Imports
-	var ArrayUtil = GestureJS.Util.Array;
-
-	// Export
-	GestureJS.GestureBox = GestureBox;
+	var _ = require("third/lodash.min"),
+		ArrayUtil = require("src/util/util.array");
 
 	function GestureBox(options) {
 		var points = Array.isArray(options) ? options : options.points || null;
@@ -46,7 +42,13 @@
 	};
 
 	GestureBox.prototype.scaleByWidth = function(gestureBox, scale) {
-		
+
 	};
 
-} ());
+	GestureBox.prototype.matches = function(other) {
+
+	};
+
+	return GestureBox;
+
+});

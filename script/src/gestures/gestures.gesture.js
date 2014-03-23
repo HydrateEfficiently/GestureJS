@@ -1,17 +1,11 @@
 /*jslint browser:true*/
 /*global _, CustomDomEvents, GestureJS */
-(function () {
+define(function (require) {
 	"use strict";
 
 	// Imports
-	var GesturePoint = GestureJS.Point,
-		PointTracker = GestureJS.PointTracker;
-
-	// Export
-	GestureJS.Gesture = {
-		define: define,
-		_checkOptionsExists: checkOptionsExists
-	};
+	var PointTracker = require("src/pointtracker"),
+		CustomDomEvents = require("third/customdomevents");
 
 	// Constants
 	var GESTURE_EVENT_SUFFIX = "gesture",
@@ -23,7 +17,7 @@
 		gestures = {},
 		names = {};
 
-	function IGesture(options) {
+	function Gesture(options) {
 		checkOptionsExists(options);
 
 		if (typeof (options.isMatch) === "function") {
@@ -62,19 +56,19 @@
 		this._timeFired = 0;
 	}
 
-	IGesture.prototype.getTimeMilliseconds = function () {
+	Gesture.prototype.getTimeMilliseconds = function () {
 		return this._time;
 	};
 
-	IGesture.prototype.getEarliestValidTime = function (currentTime) {
+	Gesture.prototype.getEarliestValidTime = function (currentTime) {
 		return Math.max(this._timeFired, currentTime - this._time);
 	};
 
-	IGesture.prototype.getMinPoints = function () {
+	Gesture.prototype.getMinPoints = function () {
 		return this._minPoints;
 	};
 
-	IGesture.prototype.register = function (element) {
+	Gesture.prototype.register = function (element) {
 		if (!gesturesByElement[element]) {
 			gesturesByElement[element] = [];
 			PointTracker.trackPointsOnElement(element);
@@ -83,13 +77,13 @@
 		this._elements.push(element);
 	};
 
-	IGesture.prototype._checkMatch = function (points) {
+	Gesture.prototype._checkMatch = function (points) {
 		if (this._isMatch(points)) {
 			this._fireEvent();
 		}
 	};
 
-	IGesture.prototype._fireEvent = function () {
+	Gesture.prototype._fireEvent = function () {
 		var eventName = "on" + this._name + GESTURE_EVENT_SUFFIX;
 		_.each(this._elements, function (element) {
 			element[eventName]();
@@ -97,12 +91,12 @@
 		this._timeFired = new Date().getTime();
 	};
 
-	IGesture.prototype._getLastTimeFired = function () {
+	Gesture.prototype._getLastTimeFired = function () {
 		return this._timeFired;
 	};
 
 	function define(options) {
-		return new IGesture(options);
+		return new Gesture(options);
 	}
 
 	function checkOptionsExists(options) {
@@ -111,4 +105,9 @@
 		}
 	}
 
-} ());
+	return {
+		define: define,
+		_checkOptionsExists: checkOptionsExists
+	};
+
+});

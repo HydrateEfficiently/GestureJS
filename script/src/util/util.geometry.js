@@ -1,5 +1,5 @@
 /*global _, GestureJS */
-(function () {
+define(function () {
 	"use strict";
 
 	function interpolateForSpline(startPoint, endPoint, currentPoint, resolution, tension, func_x_y_t) {
@@ -33,9 +33,9 @@
 		return Math.sqrt(Math.pow(deltaX, 2), Math.pow(deltaY, 2));
 	}
 
-	GestureJS.Util.Geometry = {
+	return {
 		interpolateForSpline: interpolateForSpline,
 		getDistanceBetweenPoints: getDistanceBetweenPoints
 	};
 	
-} ());
+});

@@ -1,8 +1,6 @@
 /*global GestureJS */
-(function () {
+define(function () {
 	"use strict";
-
-	GestureJS.Point = Point;
 
 	function Point(x, y, time) {
 		this.x = x;
@@ -19,4 +17,6 @@
 		this._elements.push(element);
 	};
 
-} ());
+	return Point;
+
+});
